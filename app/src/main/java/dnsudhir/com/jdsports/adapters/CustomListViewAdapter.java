@@ -40,42 +40,38 @@ public class CustomListViewAdapter<T> extends BaseAdapter {
       NavBO.NavBean navBean = (NavBO.NavBean) t;
       if (convertView == null) {
         holder = new Holder();
-        convertView = View.inflate(context, R.layout.exp_lv_child, null);
-        holder.listView = (ListView) convertView;
+        convertView = View.inflate(context, R.layout.list_child_item, null);
+        holder.tvItemName = convertView.findViewById(R.id.tvChildItem);
         convertView.setTag(holder);
       } else {
         holder = (Holder) convertView.getTag();
       }
-      TextView textView = new TextView(context);
-      textView.setText(navBean.getName());
-      holder.listView.addHeaderView(textView);
+
+      holder.tvItemName.setText(navBean.getName());
     } else if (t instanceof NavBO.NavBean.ChildrenBeanX) {
       NavBO.NavBean.ChildrenBeanX childrenBeanX = (NavBO.NavBean.ChildrenBeanX) t;
       if (convertView == null) {
         holder = new Holder();
-        convertView = View.inflate(context, R.layout.exp_lv_child, null);
-        holder.listView = (ListView) convertView;
+        convertView = View.inflate(context, R.layout.list_child_item, null);
+        holder.tvItemName = convertView.findViewById(R.id.tvChildItem);
         convertView.setTag(holder);
       } else {
         holder = (Holder) convertView.getTag();
       }
-      TextView textView = new TextView(context);
-      textView.setText(childrenBeanX.getName());
-      holder.listView.addHeaderView(textView);
+      holder.tvItemName.setText(childrenBeanX.getName());
     } else if (t instanceof NavBO.NavBean.ChildrenBeanX.ChildrenBean) {
       NavBO.NavBean.ChildrenBeanX.ChildrenBean childrenBean =
           (NavBO.NavBean.ChildrenBeanX.ChildrenBean) t;
       if (convertView == null) {
         holder = new Holder();
-        convertView = View.inflate(context, R.layout.exp_lv_child, null);
-        holder.listView = (ListView) convertView;
+        convertView = View.inflate(context, R.layout.list_child_item, null);
+        holder.tvItemName = convertView.findViewById(R.id.tvChildItem);
         convertView.setTag(holder);
       } else {
         holder = (Holder) convertView.getTag();
       }
-      TextView textView = new TextView(context);
-      textView.setText(childrenBean.getName());
-      holder.listView.addHeaderView(textView);
+
+      holder.tvItemName.setText(childrenBean.getName());
     } else if (t instanceof String) {
       String itemName = (String) t;
       if (convertView == null) {

@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import dnsudhir.com.jdsports.adapters.CustomListViewAdapter;
@@ -89,12 +90,30 @@ public class MainActivity extends AppCompatActivity {
           List<NavBO.NavBean.ChildrenBeanX> childrenBeanXList = navBean.getChildren();
           CustomListViewAdapter<NavBO.NavBean.ChildrenBeanX> adapter =
               new CustomListViewAdapter<>(MainActivity.this, childrenBeanXList);
-          ListView listView = (ListView) view;
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
           listView.setAdapter(adapter);
+          linearLayout.addView(listView);
         } else if (object instanceof NavBO.NavBean.ChildrenBeanX) {
-
+          NavBO.NavBean.ChildrenBeanX childrenBeanX = (NavBO.NavBean.ChildrenBeanX) object;
+          List<NavBO.NavBean.ChildrenBeanX.ChildrenBean> childrenBeans =
+              childrenBeanX.getChildren();
+          CustomListViewAdapter<NavBO.NavBean.ChildrenBeanX.ChildrenBean> adapter =
+              new CustomListViewAdapter<>(MainActivity.this, childrenBeans);
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
+          listView.setAdapter(adapter);
+          linearLayout.addView(listView);
         } else if (object instanceof NavBO.NavBean.ChildrenBeanX.ChildrenBean) {
-
+          NavBO.NavBean.ChildrenBeanX.ChildrenBean childrenBean =
+              (NavBO.NavBean.ChildrenBeanX.ChildrenBean) object;
+          List<String> childrenBeans = (List<String>) childrenBean.getChildren();
+          CustomListViewAdapter<String> adapter =
+              new CustomListViewAdapter<>(MainActivity.this, childrenBeans);
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
+          listView.setAdapter(adapter);
+          linearLayout.addView(listView);
         } else if (object instanceof String) {
 
         }
