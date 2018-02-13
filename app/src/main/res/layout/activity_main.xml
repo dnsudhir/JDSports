@@ -24,7 +24,7 @@
       app:headerLayout="@layout/nav_header_main"
       >
 
-    <ExpandableListView
+    <ListView
         android:id="@+id/exp_lv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
