@@ -1,17 +1,20 @@
 package dnsudhir.com.jdsports;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
+import dnsudhir.com.jdsports.adapters.CustomListViewAdapter;
 import dnsudhir.com.jdsports.adapters.ExpListAdapter;
+import dnsudhir.com.jdsports.adapters.TreeAdapter;
+import dnsudhir.com.jdsports.model.Content;
 import dnsudhir.com.jdsports.model.NavBO;
 import dnsudhir.com.jdsports.utils.CallAPI;
 import dnsudhir.com.jdsports.utils.ServiceGenerator;
@@ -24,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
   private ExpandableListView expLv;
   private List<String> listDataHeader;
   private HashMap<String, List<NavBO.NavBean.ChildrenBeanX>> listDataChild;
+  private TreeAdapter treeAdapter;
   private ListView listView;
+  private Content navMain;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -39,17 +44,21 @@ public class MainActivity extends AppCompatActivity {
     drawer.addDrawerListener(toggle);
     toggle.syncState();
 
-    NavigationView navigationView = findViewById(R.id.nav_view);
     listView = findViewById(R.id.listView);
+    expLv = findViewById(R.id.exp_lv);
 
-    mGetNavData();
+    //Method that calls WebService To get Nav Response
+    //nGetNavData();
+    method3(null);
   }
 
-  private void mGetNavData() {
+  private void nGetNavData() {
 
     String api_key = "56E94850997111E3A5E20800200C9A66";
-
-    new CallAPI.Builder<NavBO>(this, ServiceGenerator.getInstance().getNav(api_key),
+    /**
+     * Utility Class for Calling WebServices
+     */
+    new CallAPI.Builder<>(this, ServiceGenerator.getInstance().getNav(api_key),
         true).setOnCallCompleteListner(new CallAPI.OnCallComplete<NavBO>() {
       @Override public void CallCompleted(boolean b, NavBO result) {
         if (result != null) {
@@ -59,30 +68,38 @@ public class MainActivity extends AppCompatActivity {
     }).execute();
   }
 
+  /**
+   * Handling the response
+   */
   private void mHandleNavBo(NavBO result) {
 
     List<NavBO.NavBean> navBeans = result.getNav();
-    medthod1(navBeans);
+    method1(navBeans);
   }
 
-
-    method2(navBeans);
-  }
-  /**Method 1
+  /**
+   * Method 1
    * Using Expandable List View
+   * We will use Recursion and Generics to create nested expandable list view
    */
-  private void medthod1(List<NavBO.NavBean> navBeans) {
+  private void method1(List<NavBO.NavBean> navBeans) {
+    listDataHeader = new ArrayList<>();
+    listDataChild = new HashMap<>();
     for (int i = 0; i < navBeans.size(); i++) {
       NavBO.NavBean navBean = navBeans.get(i);
+
       listDataHeader.add(navBean.getName());
       listDataChild.put(navBean.getName(), navBean.getChildren());
     }
     ExpListAdapter<NavBO.NavBean.ChildrenBeanX> listAdapter =
         new ExpListAdapter<>(this, listDataHeader, listDataChild);
+    expLv.setAdapter(listAdapter);
+  }
 
   /**
    * Method 2
    * Using ListView
+   * We will use Recursion and Generics to create nested List View which expands on click
    */
   private void method2(List<NavBO.NavBean> navBeans) {
 
@@ -94,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         Object object = parent.getAdapter().getItem(position);
+
+        /**
+         *  We use the same concept we use in Expandable list view
+         *  On List Item click we will add listview dynamically for linearlayout
+         *  Depending on the type of data we will call CustLitViewadapter recursively
+         */
 
         if (object instanceof NavBO.NavBean) {
           NavBO.NavBean navBean = (NavBO.NavBean) object;
@@ -124,25 +147,65 @@ public class MainActivity extends AppCompatActivity {
           ListView listView = new ListView(MainActivity.this);
           listView.setAdapter(adapter);
           linearLayout.addView(listView);
-        } else if (object instanceof String) {
-
         }
       }
     });
   }
 
+  private void method3(List<NavBO.NavBean> navBeans) {
+
+    //treeAdapter = new TreeAdapter(this, null);
+
+    navMain = new Content("BOOK A");
+
+    Content part1 = new Content("Part I");
+    Content chapter1 = new Content("Chapter 1");
+    chapter1.addSubContent(new Content("some topic 1.1"));
+    chapter1.addSubContent(new Content("some topic 1.2"));
+    chapter1.addSubContent(new Content("some topic 1.3"));
+    chapter1.addSubContent(new Content("some topic 1.4"));
+    chapter1.addSubContent(new Content("some topic 1.5"));
+    Content chapter2 = new Content("Chapter 2");
+    chapter2.addSubContent(new Content("some topic 2.1"));
+    chapter2.addSubContent(new Content("some topic 2.2"));
+    chapter2.addSubContent(new Content("some topic 2.3"));
+    Content chapter3 = new Content("Chapter 3");
+    chapter3.addSubContent(new Content("some topic 3.1"));
+    chapter3.addSubContent(new Content("some topic 3.2"));
+
+    part1.addSubContent(chapter1);
+    part1.addSubContent(chapter2);
+    part1.addSubContent(chapter3);
+
+    Content part2 = new Content("Part II");
+    Content chapter4 = new Content("Chapter 4");
+    chapter4.addSubContent(new Content("some topic 4.1"));
+    chapter4.addSubContent(new Content("some topic 4.2"));
+    chapter4.addSubContent(new Content("some topic 4.3"));
+    chapter4.addSubContent(new Content("some topic 4.4"));
+    Content chapter5 = new Content("Chapter 5");
+    chapter5.addSubContent(new Content("some topic 5.1"));
+    chapter5.addSubContent(new Content("some topic 5.2"));
+    chapter5.addSubContent(new Content("some topic 5.3"));
+    chapter5.addSubContent(new Content("some topic 5.4"));
+    chapter5.addSubContent(new Content("some topic 5.5"));
+
+    part2.addSubContent(chapter4);
+    part2.addSubContent(chapter5);
+
+    navMain.addSubContent(part1);
+    navMain.addSubContent(part2);
+
+    treeAdapter = new TreeAdapter(this, navMain, 4);
+    listView.setAdapter(treeAdapter.asListAdapter());
+  }
+
   @Override public void onBackPressed() {
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
     if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
       super.onBackPressed();
     }
-  }
-
-  @Override public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.main, menu);
-    return true;
   }
 }

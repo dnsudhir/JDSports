@@ -16,36 +16,47 @@ import java.util.List;
 
 public class ExpListAdapter<T> extends BaseExpandableListAdapter {
 
-  private Context _context;
-  private List<String> _listDataHeader; // header titles
-  // child data in format of header title, child title
-  private HashMap<String, List<T>> _listDataChild;
+  private Context context;
+  private List<String> listDataHeader;
+  private HashMap<String, List<T>> listDataChild;
 
   public ExpListAdapter(Context context, List<String> listDataHeader,
       HashMap<String, List<T>> listChildData) {
-    this._context = context;
-    this._listDataHeader = listDataHeader;
-    this._listDataChild = listChildData;
+    this.context = context;
+    this.listDataHeader = listDataHeader;
+    this.listDataChild = listChildData;
   }
 
   @Override public Object getChild(int groupPosition, int childPosititon) {
-    return this._listDataChild.get(this._listDataHeader.get(groupPosition)).get(childPosititon);
+    return this.listDataChild.get(this.listDataHeader.get(groupPosition)).get(childPosititon);
   }
 
   @Override public long getChildId(int groupPosition, int childPosition) {
     return childPosition;
   }
 
+  /**
+   * We Use the Same Adapter recursively to create nested expandable listview
+   * So using instance of we will know which type of data is sent and act accordingly
+   * We will call this adapter recursively until we get strings as data
+   *
+   *
+   * @param groupPosition
+   * @param childPosition
+   * @param isLastChild
+   * @param convertView
+   * @param parent
+   * @return
+   */
+
   @Override
   public View getChildView(int groupPosition, final int childPosition, boolean isLastChild,
       View convertView, ViewGroup parent) {
-    T t = _listDataChild.get(_listDataHeader.get(groupPosition)).get(childPosition);
+    T t = listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition);
     if (t instanceof NavBO.NavBean.ChildrenBeanX) {
 
       if (convertView == null) {
-        LayoutInflater infalInflater =
-            (LayoutInflater) this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = infalInflater.inflate(R.layout.exp_lv_child, null);
+        convertView = LayoutInflater.from(context).inflate(R.layout.exp_lv_child, null);
       }
 
       NavBO.NavBean.ChildrenBeanX childrenBeansX = (NavBO.NavBean.ChildrenBeanX) t;
@@ -59,15 +70,13 @@ public class ExpListAdapter<T> extends BaseExpandableListAdapter {
             (List<NavBO.NavBean.ChildrenBeanX.ChildrenBean>) childrenBeansX.getChildren());
 
         ExpListAdapter<NavBO.NavBean.ChildrenBeanX.ChildrenBean> listAdapter =
-            new ExpListAdapter<>(_context, listDataHeader, listDataChild);
+            new ExpListAdapter<>(context, listDataHeader, listDataChild);
         ExpandableListView expandableListView = convertView.findViewById(R.id.ExpLvChild);
         expandableListView.setAdapter(listAdapter);
       }
     } else if (t instanceof NavBO.NavBean.ChildrenBeanX.ChildrenBean) {
       if (convertView == null) {
-        LayoutInflater infalInflater =
-            (LayoutInflater) this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = infalInflater.inflate(R.layout.exp_lv_child, null);
+        convertView = LayoutInflater.from(context).inflate(R.layout.exp_lv_child, null);
       }
       NavBO.NavBean.ChildrenBeanX.ChildrenBean childrenBeans =
           (NavBO.NavBean.ChildrenBeanX.ChildrenBean) t;
@@ -83,16 +92,14 @@ public class ExpListAdapter<T> extends BaseExpandableListAdapter {
         listDataChild.put(childrenBeans.getName(), (List<String>) childrenBeans.getChildren());
 
         ExpListAdapter<String> listAdapter =
-            new ExpListAdapter<String>(_context, listDataHeader, listDataChild);
+            new ExpListAdapter<String>(context, listDataHeader, listDataChild);
         ExpandableListView expandableListView = convertView.findViewById(R.id.ExpLvChild);
         expandableListView.setAdapter(listAdapter);
       }
     } else if (t instanceof String) {
 
       if (convertView == null) {
-        LayoutInflater infalInflater =
-            (LayoutInflater) this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = infalInflater.inflate(R.layout.list_child_item, null);
+        convertView = LayoutInflater.from(context).inflate(R.layout.list_child_item, null);
       }
       TextView tvChildItem = convertView.findViewById(R.id.tvChildItem);
       tvChildItem.setText(t.toString());
@@ -101,15 +108,15 @@ public class ExpListAdapter<T> extends BaseExpandableListAdapter {
   }
 
   @Override public int getChildrenCount(int groupPosition) {
-    return this._listDataChild.get(this._listDataHeader.get(groupPosition)).size();
+    return this.listDataChild.get(this.listDataHeader.get(groupPosition)).size();
   }
 
   @Override public Object getGroup(int groupPosition) {
-    return this._listDataHeader.get(groupPosition);
+    return this.listDataHeader.get(groupPosition);
   }
 
   @Override public int getGroupCount() {
-    return this._listDataHeader.size();
+    return this.listDataHeader.size();
   }
 
   @Override public long getGroupId(int groupPosition) {
@@ -120,12 +127,10 @@ public class ExpListAdapter<T> extends BaseExpandableListAdapter {
       ViewGroup parent) {
     String headerTitle = (String) getGroup(groupPosition);
     if (convertView == null) {
-      LayoutInflater infalInflater =
-          (LayoutInflater) this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-      convertView = infalInflater.inflate(R.layout.exp_lv_grp, null);
+      convertView = LayoutInflater.from(context).inflate(R.layout.exp_lv_grp, null);
     }
 
-    TextView lblListHeader = (TextView) convertView.findViewById(R.id.tvExpListHeader);
+    TextView lblListHeader = convertView.findViewById(R.id.tvExpListHeader);
     lblListHeader.setTypeface(null, Typeface.BOLD);
     lblListHeader.setText(headerTitle);
 
@@ -137,6 +142,6 @@ public class ExpListAdapter<T> extends BaseExpandableListAdapter {
   }
 
   @Override public boolean isChildSelectable(int groupPosition, int childPosition) {
-    return true;
+    return false;
   }
 }

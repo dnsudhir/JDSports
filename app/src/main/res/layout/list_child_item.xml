@@ -6,11 +6,15 @@
     >
 
 
-
   <TextView
       android:id="@+id/tvChildItem"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_marginLeft="12dp"
+      android:layout_marginStart="12dp"
+      android:textAllCaps="true"
+      android:textSize="16sp"
+      android:textStyle="bold"
       />
 
 </LinearLayout>
