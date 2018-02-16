@@ -12,39 +12,31 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 import dnsudhir.com.jdsports.adapters.CustomListViewAdapter;
 import dnsudhir.com.jdsports.model.NavBO;
 import dnsudhir.com.jdsports.utils.CallAPI;
 import dnsudhir.com.jdsports.utils.ServiceGenerator;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-  private ListView expLv;
-  private List<String> listDataHeader;
-  private HashMap<String, List<NavBO.NavBean.ChildrenBeanX>> listDataChild;
+  private ListView listView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle =
         new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
             R.string.navigation_drawer_close);
     drawer.addDrawerListener(toggle);
     toggle.syncState();
 
-    NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-    expLv = findViewById(R.id.exp_lv);
-
-    listDataHeader = new ArrayList<>();
-    listDataChild = new HashMap<>();
+    NavigationView navigationView = findViewById(R.id.nav_view);
+    listView = findViewById(R.id.listView);
 
     mGetNavData();
   }
@@ -66,21 +58,22 @@ public class MainActivity extends AppCompatActivity {
   private void mHandleNavBo(NavBO result) {
 
     List<NavBO.NavBean> navBeans = result.getNav();
-    Toast.makeText(this, navBeans.get(0).getName(), Toast.LENGTH_SHORT).show();
 
-   /* for (int i = 0; i < navBeans.size(); i++) {
-      NavBO.NavBean navBean = navBeans.get(i);
-      listDataHeader.add(navBean.getName());
-      listDataChild.put(navBean.getName(), navBean.getChildren());
-    }*/
-    //ExpListAdapter<NavBO.NavBean.ChildrenBeanX> listAdapter =
-    //    new ExpListAdapter<>(this, listDataHeader, listDataChild);
+
+    method2(navBeans);
+  }
+
+  /**
+   * Method 2
+   * Using ListView
+   */
+  private void method2(List<NavBO.NavBean> navBeans) {
 
     CustomListViewAdapter<NavBO.NavBean> listAdapter = new CustomListViewAdapter<>(this, navBeans);
 
-    expLv.setAdapter(listAdapter);
+    listView.setAdapter(listAdapter);
 
-    expLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         Object object = parent.getAdapter().getItem(position);
@@ -122,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override public void onBackPressed() {
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
     if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
