@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.Toast;
 import dnsudhir.com.jdsports.adapters.ExpListAdapter;
 import dnsudhir.com.jdsports.model.NavBO;
@@ -23,25 +24,23 @@ public class MainActivity extends AppCompatActivity {
   private ExpandableListView expLv;
   private List<String> listDataHeader;
   private HashMap<String, List<NavBO.NavBean.ChildrenBeanX>> listDataChild;
+  private ListView listView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle =
         new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
             R.string.navigation_drawer_close);
     drawer.addDrawerListener(toggle);
     toggle.syncState();
 
-    NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-    expLv = findViewById(R.id.exp_lv);
-
-    listDataHeader = new ArrayList<>();
-    listDataChild = new HashMap<>();
+    NavigationView navigationView = findViewById(R.id.nav_view);
+    listView = findViewById(R.id.listView);
 
     mGetNavData();
   }
@@ -66,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
     medthod1(navBeans);
   }
 
+
+    method2(navBeans);
+  }
   /**Method 1
    * Using Expandable List View
    */
@@ -78,7 +80,55 @@ public class MainActivity extends AppCompatActivity {
     ExpListAdapter<NavBO.NavBean.ChildrenBeanX> listAdapter =
         new ExpListAdapter<>(this, listDataHeader, listDataChild);
 
-    expLv.setAdapter(listAdapter);
+  /**
+   * Method 2
+   * Using ListView
+   */
+  private void method2(List<NavBO.NavBean> navBeans) {
+
+    CustomListViewAdapter<NavBO.NavBean> listAdapter = new CustomListViewAdapter<>(this, navBeans);
+
+    listView.setAdapter(listAdapter);
+
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Object object = parent.getAdapter().getItem(position);
+
+        if (object instanceof NavBO.NavBean) {
+          NavBO.NavBean navBean = (NavBO.NavBean) object;
+          List<NavBO.NavBean.ChildrenBeanX> childrenBeanXList = navBean.getChildren();
+          CustomListViewAdapter<NavBO.NavBean.ChildrenBeanX> adapter =
+              new CustomListViewAdapter<>(MainActivity.this, childrenBeanXList);
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
+          listView.setAdapter(adapter);
+          linearLayout.addView(listView);
+        } else if (object instanceof NavBO.NavBean.ChildrenBeanX) {
+          NavBO.NavBean.ChildrenBeanX childrenBeanX = (NavBO.NavBean.ChildrenBeanX) object;
+          List<NavBO.NavBean.ChildrenBeanX.ChildrenBean> childrenBeans =
+              childrenBeanX.getChildren();
+          CustomListViewAdapter<NavBO.NavBean.ChildrenBeanX.ChildrenBean> adapter =
+              new CustomListViewAdapter<>(MainActivity.this, childrenBeans);
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
+          listView.setAdapter(adapter);
+          linearLayout.addView(listView);
+        } else if (object instanceof NavBO.NavBean.ChildrenBeanX.ChildrenBean) {
+          NavBO.NavBean.ChildrenBeanX.ChildrenBean childrenBean =
+              (NavBO.NavBean.ChildrenBeanX.ChildrenBean) object;
+          List<String> childrenBeans = (List<String>) childrenBean.getChildren();
+          CustomListViewAdapter<String> adapter =
+              new CustomListViewAdapter<>(MainActivity.this, childrenBeans);
+          LinearLayout linearLayout = (LinearLayout) view;
+          ListView listView = new ListView(MainActivity.this);
+          listView.setAdapter(adapter);
+          linearLayout.addView(listView);
+        } else if (object instanceof String) {
+
+        }
+      }
+    });
   }
 
   @Override public void onBackPressed() {
@@ -90,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-
-
+  @Override public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.main, menu);
+    return true;
+  }
 }
